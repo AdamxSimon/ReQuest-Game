@@ -1,0 +1,1 @@
+const tileSize = 64;
