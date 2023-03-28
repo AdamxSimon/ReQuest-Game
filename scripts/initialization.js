@@ -1,11 +1,26 @@
-function initialize(worldHeight, worldWidth) {
-  const canvas = document.createElement("canvas");
+let world;
 
-  canvas.height = withTileSize(worldHeight);
-  canvas.width = withTileSize(worldWidth);
-
-  const canvasContainer = document.getElementById("canvas-container");
-  canvasContainer.appendChild(canvas);
+function loop() {
+  Object.entries(world.terrainMap).forEach(([coordinatesAsString, terrain]) => {
+    const coordinates = JSON.parse(coordinatesAsString);
+    const edgeCoordinates = world.getEdgeCoordinates();
+    const normalizedCoordinates = normalizeCoordinates(
+      coordinates,
+      edgeCoordinates
+    );
+    terrain.draw(world.context, normalizedCoordinates);
+  });
+  requestAnimationFrame(loop);
 }
 
-initialize(2, 2);
+async function initialize(height, width) {
+  world = new World(height, width);
+
+  await loadTerrainSprites();
+  world.initializeTerrainMap();
+  world.createCanvas();
+
+  loop();
+}
+
+initialize(5, 5);
