@@ -26,8 +26,31 @@ class Sprite {
     }
   }
 
+  getCameraMovementOffset(cameraFocus) {
+    const {
+      isMoving,
+      direction,
+      sprite: { animationFramesLeft },
+    } = cameraFocus;
+
+    if (isMoving) {
+      switch (direction) {
+        case "LEFT":
+          return [animationFramesLeft, 0];
+        case "UP":
+          return [0, animationFramesLeft];
+        case "RIGHT":
+          return [-animationFramesLeft, 0];
+        case "DOWN":
+          return [0, -animationFramesLeft];
+      }
+    } else {
+      return [0, 0];
+    }
+  }
+
   draw(world) {
-    const [xDrawing, yDrawing] = getDrawingCoordinates(
+    const [xObject, yObject] = getDrawingCoordinates(
       this.gameObject.position,
       world.edgeCoordinates
     );
@@ -36,12 +59,23 @@ class Sprite {
       this.animationFramesLeft -= this.gameObject.speed;
     }
 
-    const [xOffset, yOffset] = this.getAnimationFrameOffset();
+    const [xObjectMovementOffset, yObjectMovementOffset] =
+      this.getAnimationFrameOffset();
+
+    const [xCamera, yCamera] = world.cameraFocus.position;
+    const [xCameraMovementOffset, yCameraMovementOffset] =
+      this.getCameraMovementOffset(world.cameraFocus);
 
     world.context.drawImage(
       this.image,
-      withTileSize(xDrawing) + xOffset,
-      withTileSize(yDrawing) + yOffset
+      withTileSize(xObject) +
+        xObjectMovementOffset -
+        withTileSize(xCamera) -
+        xCameraMovementOffset,
+      withTileSize(yObject) +
+        yObjectMovementOffset -
+        withTileSize(yCamera) -
+        yCameraMovementOffset
     );
 
     if (this.animationFramesLeft === 0) {

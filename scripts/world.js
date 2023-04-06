@@ -34,14 +34,14 @@ class World {
 
   initializePlayer(coordinates = [0, 0]) {
     const [x, y] = coordinates;
-    this.characters.push(
-      new Character({
-        position: [x, y],
-        speed: 2,
-        isControlled: true,
-        imageIndex: "player",
-      })
-    );
+    const initialPlayer = new Character({
+      position: [x, y],
+      speed: 2,
+      isControlled: true,
+      imageIndex: "player",
+    });
+    this.characters.push(initialPlayer);
+    this.cameraFocus = initialPlayer;
   }
 
   initializeCanvas() {
