@@ -24,6 +24,6 @@ body {
 }
 
 canvas {
-  outline: 2px solid black;
+  background-color: lightblue;
   image-rendering: pixelated;
 }

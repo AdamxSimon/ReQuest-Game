@@ -7,13 +7,6 @@ function getCoordinatesAsIndex(coordinates) {
   return `[${x}, ${y}]`;
 }
 
-function getDrawingCoordinates(coordinates, edgeCoordinates) {
-  return [
-    coordinates[0] + edgeCoordinates[0],
-    coordinates[1] + edgeCoordinates[1],
-  ];
-}
-
 function getNextTile(coordinates, direction) {
   const [x, y] = coordinates;
   switch (direction) {

@@ -49,10 +49,24 @@ class Sprite {
     }
   }
 
+  #getDrawingCoordinates(coordinates, edgeCoordinates) {
+    return [
+      coordinates[0] + edgeCoordinates[0],
+      coordinates[1] + edgeCoordinates[1],
+    ];
+  }
+
   draw(world) {
-    const [xObject, yObject] = getDrawingCoordinates(
+    const [xObject, yObject] = this.#getDrawingCoordinates(
       this.gameObject.position,
       world.edgeCoordinates
+    );
+
+    const xWindowAdjustment = Math.floor(
+      world.canvas.width / 2 - withTileSize(world.width) / 2
+    );
+    const yWindowAdjustment = Math.floor(
+      world.canvas.height / 2 - withTileSize(world.height) / 2
     );
 
     if (this.gameObject.isMoving) {
@@ -71,11 +85,13 @@ class Sprite {
       withTileSize(xObject) +
         xObjectMovementOffset -
         withTileSize(xCamera) -
-        xCameraMovementOffset,
+        xCameraMovementOffset +
+        xWindowAdjustment,
       withTileSize(yObject) +
         yObjectMovementOffset -
         withTileSize(yCamera) -
-        yCameraMovementOffset
+        yCameraMovementOffset +
+        yWindowAdjustment
     );
 
     if (this.animationFramesLeft === 0) {

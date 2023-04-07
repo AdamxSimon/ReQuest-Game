@@ -60,10 +60,11 @@ class World {
   }
 
   initializeCanvas() {
-    this.canvas.height = withTileSize(this.height);
-    this.canvas.width = withTileSize(this.width);
-
     const canvasContainer = document.getElementById("canvas-container");
+
+    this.canvas.height = canvasContainer.clientHeight;
+    this.canvas.width = canvasContainer.clientWidth;
+
     canvasContainer.appendChild(this.canvas);
   }
 
