@@ -1,8 +1,11 @@
-let characterSprites = { player: "../sprites/player.png" };
+let characterSprites = {
+  player: "../sprites/player.png",
+  character: "../sprites/character.png",
+};
 
 class Character extends GameObject {
   constructor(config) {
-    super({ ...config, imageMap: characterSprites });
+    super({ ...config, isObstruction: true, imageMap: characterSprites });
 
     this.isControlled = config.isControlled || false;
 

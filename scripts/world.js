@@ -11,8 +11,19 @@ class World {
     this.canvas = document.createElement("canvas");
     this.context = this.canvas.getContext("2d");
 
-    this.terrain = [];
-    this.characters = [];
+    this.tiles = {};
+  }
+
+  initializeTiles() {
+    for (let y = -this.edgeCoordinates[1]; y <= this.edgeCoordinates[1]; y++) {
+      for (
+        let x = -this.edgeCoordinates[0];
+        x <= this.edgeCoordinates[0];
+        x++
+      ) {
+        this.tiles[getCoordinatesAsIndex([x, y])] = new Tile();
+      }
+    }
   }
 
   initializeTerrain() {
@@ -22,25 +33,29 @@ class World {
         x <= this.edgeCoordinates[0];
         x++
       ) {
-        this.terrain.push(
-          new Terrain({
-            position: [x, y],
-            imageIndex: "grass",
-          })
-        );
+        this.tiles[getCoordinatesAsIndex([x, y])].terrain = new Terrain({
+          position: [x, y],
+          imageIndex: "grass",
+        });
       }
     }
   }
 
-  initializePlayer(coordinates = [0, 0]) {
-    const [x, y] = coordinates;
+  initializeCharacters() {
     const initialPlayer = new Character({
-      position: [x, y],
+      position: [0, 0],
       speed: 2,
       isControlled: true,
       imageIndex: "player",
     });
-    this.characters.push(initialPlayer);
+    const testCharacter = new Character({
+      position: [1, 0],
+      imageIndex: "character",
+    });
+
+    this.tiles[getCoordinatesAsIndex([0, 0])].character = initialPlayer;
+    this.tiles[getCoordinatesAsIndex([1, 0])].character = testCharacter;
+
     this.cameraFocus = initialPlayer;
   }
 
@@ -52,16 +67,34 @@ class World {
     canvasContainer.appendChild(this.canvas);
   }
 
+  async initialize() {
+    await loadSprites(terrainSprites);
+    await loadSprites(characterSprites);
+
+    this.initializeTiles();
+    this.initializeTerrain();
+    this.initializeCharacters();
+    this.initializeCanvas();
+
+    this.play();
+  }
+
   play() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.terrain.forEach((terrain) => {
-      terrain.update();
-      terrain.render(this);
+    const characters = [];
+
+    Object.values(this.tiles).forEach((tile) => {
+      tile.terrain.update(this);
+      tile.terrain.render(this);
+
+      if (tile.character) {
+        characters.push(tile.character);
+      }
     });
 
-    this.characters.forEach((character) => {
-      character.update();
+    characters.forEach((character) => {
+      character.update(this);
       character.render(this);
     });
 

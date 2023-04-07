@@ -2,6 +2,8 @@ class GameObject {
   constructor(config) {
     this.position = config.position;
 
+    this.isObstruction = config.isObstruction || false;
+
     this.direction = "DOWN";
 
     this.isMoving = false;
@@ -10,25 +12,26 @@ class GameObject {
     this.sprite = new Sprite({ ...config, gameObject: this });
   }
 
-  update() {
-    const [x, y] = this.position;
-    const direction = this.controls?.heldDirections[0];
-    if (direction && !this.isMoving) {
-      this.direction = direction;
-      this.isMoving = true;
-      switch (direction) {
-        case "LEFT":
-          this.position = [x - 1, y];
-          break;
-        case "UP":
-          this.position = [x, y - 1];
-          break;
-        case "RIGHT":
-          this.position = [x + 1, y];
-          break;
-        case "DOWN":
-          this.position = [x, y + 1];
-          break;
+  move(destination) {
+    this.isMoving = true;
+    this.position = destination;
+  }
+
+  update(world) {
+    const heldDirection = this.controls?.heldDirections[0];
+
+    if (heldDirection && !this.isMoving) {
+      this.direction = heldDirection;
+      const destinationCoordinates = getNextTile(this.position, this.direction);
+      const destinationTile =
+        world.tiles[getCoordinatesAsIndex(destinationCoordinates)];
+
+      if (destinationTile && !destinationTile?.character?.isObstruction) {
+        const previousPosition = this.position;
+        this.move(destinationCoordinates);
+        world.tiles[getCoordinatesAsIndex(previousPosition)].character = null;
+        world.tiles[getCoordinatesAsIndex(destinationCoordinates)].character =
+          this;
       }
     }
   }
