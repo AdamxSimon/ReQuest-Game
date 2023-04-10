@@ -62,12 +62,7 @@ class Sprite {
       world.edgeCoordinates
     );
 
-    const xWindowAdjustment = Math.floor(
-      world.canvas.width / 2 - withTileSize(world.width) / 2
-    );
-    const yWindowAdjustment = Math.floor(
-      world.canvas.height / 2 - withTileSize(world.height) / 2
-    );
+    const [xGameWindowOffset, yGameWindowOffset] = world.getGameWindowOffset();
 
     if (this.gameObject.isMoving) {
       this.animationFramesLeft -= this.gameObject.speed;
@@ -76,9 +71,9 @@ class Sprite {
     const [xObjectMovementOffset, yObjectMovementOffset] =
       this.getAnimationFrameOffset();
 
-    const [xCamera, yCamera] = world.cameraFocus.position;
+    const [xCamera, yCamera] = world.camera.getPosition();
     const [xCameraMovementOffset, yCameraMovementOffset] =
-      this.getCameraMovementOffset(world.cameraFocus);
+      world.camera.getCameraMovementOffset();
 
     world.context.drawImage(
       this.image,
@@ -86,12 +81,12 @@ class Sprite {
         xObjectMovementOffset -
         withTileSize(xCamera) -
         xCameraMovementOffset +
-        xWindowAdjustment,
+        xGameWindowOffset,
       withTileSize(yObject) +
         yObjectMovementOffset -
         withTileSize(yCamera) -
         yCameraMovementOffset +
-        yWindowAdjustment
+        yGameWindowOffset
     );
 
     if (this.animationFramesLeft === 0) {

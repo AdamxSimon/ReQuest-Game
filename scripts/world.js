@@ -13,6 +13,8 @@ class World {
 
     this.tiles = {};
 
+    this.camera = new Camera();
+
     this.renderDistance = 4;
   }
 
@@ -58,7 +60,7 @@ class World {
     this.tiles[getCoordinatesAsIndex([0, 0])].character = initialPlayer;
     this.tiles[getCoordinatesAsIndex([1, 0])].character = testCharacter;
 
-    this.cameraFocus = initialPlayer;
+    this.camera.updateFocus(initialPlayer);
   }
 
   initializeCanvas() {
@@ -82,30 +84,29 @@ class World {
     this.play();
   }
 
+  getGameWindowOffset() {
+    return [
+      Math.floor(this.canvas.width / 2) -
+        Math.floor(withTileSize(this.width) / 2),
+      Math.floor(this.canvas.height / 2) -
+        Math.floor(withTileSize(this.height) / 2),
+    ];
+  }
+
   #getCoordinatesToRender() {
     const tilesToRender = [];
+    const [xCamera, yCamera] = this.camera.getPosition();
     for (
-      let y = Math.min(
-        this.cameraFocus.position[1] + this.renderDistance,
-        this.edgeCoordinates[1]
-      );
-      y >=
-      Math.max(
-        this.cameraFocus.position[1] - this.renderDistance,
-        -this.edgeCoordinates[1]
-      );
+      let y = Math.min(yCamera + this.renderDistance, this.edgeCoordinates[1]);
+      y >= Math.max(yCamera - this.renderDistance, -this.edgeCoordinates[1]);
       y--
     ) {
       for (
         let x = Math.max(
-          this.cameraFocus.position[0] - this.renderDistance,
+          xCamera - this.renderDistance,
           -this.edgeCoordinates[0]
         );
-        x <=
-        Math.min(
-          this.cameraFocus.position[0] + this.renderDistance,
-          this.edgeCoordinates[0]
-        );
+        x <= Math.min(xCamera + this.renderDistance, this.edgeCoordinates[0]);
         x++
       ) {
         tilesToRender.push(getCoordinatesAsIndex([x, y]));
@@ -115,22 +116,35 @@ class World {
   }
 
   play() {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.clearRect(
+      Math.floor(this.canvas.width / 2) -
+        withTileSize(this.renderDistance + 1) -
+        Math.floor(tileSize / 2),
+      Math.floor(this.canvas.height / 2) -
+        withTileSize(this.renderDistance + 1) -
+        Math.floor(tileSize / 2),
+      Math.floor(this.canvas.width / 2) +
+        withTileSize(this.renderDistance + 1) +
+        Math.floor(tileSize / 2),
+      Math.floor(this.canvas.height / 2) +
+        withTileSize(this.renderDistance) +
+        Math.floor(tileSize / 2)
+    );
 
     const coordinatesToRender = this.#getCoordinatesToRender();
 
-    const characters = [];
+    const charactersToRender = [];
 
     coordinatesToRender.forEach((coordinate) => {
       this.tiles[coordinate].terrain.update(this);
       this.tiles[coordinate].terrain.render(this);
 
       if (this.tiles[coordinate].character) {
-        characters.push(this.tiles[coordinate].character);
+        charactersToRender.push(this.tiles[coordinate].character);
       }
     });
 
-    characters.forEach((character) => {
+    charactersToRender.forEach((character) => {
       character.update(this);
       character.render(this);
     });
