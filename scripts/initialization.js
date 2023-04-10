@@ -5,4 +5,4 @@ function initialize(height, width) {
   world.initialize();
 }
 
-initialize(5, 5);
+initialize(15, 15);

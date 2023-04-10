@@ -12,6 +12,8 @@ class World {
     this.context = this.canvas.getContext("2d");
 
     this.tiles = {};
+
+    this.renderDistance = 4;
   }
 
   initializeTiles() {
@@ -80,17 +82,51 @@ class World {
     this.play();
   }
 
+  #getCoordinatesToRender() {
+    const tilesToRender = [];
+    for (
+      let y = Math.min(
+        this.cameraFocus.position[1] + this.renderDistance,
+        this.edgeCoordinates[1]
+      );
+      y >=
+      Math.max(
+        this.cameraFocus.position[1] - this.renderDistance,
+        -this.edgeCoordinates[1]
+      );
+      y--
+    ) {
+      for (
+        let x = Math.max(
+          this.cameraFocus.position[0] - this.renderDistance,
+          -this.edgeCoordinates[0]
+        );
+        x <=
+        Math.min(
+          this.cameraFocus.position[0] + this.renderDistance,
+          this.edgeCoordinates[0]
+        );
+        x++
+      ) {
+        tilesToRender.push(getCoordinatesAsIndex([x, y]));
+      }
+    }
+    return tilesToRender;
+  }
+
   play() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    const coordinatesToRender = this.#getCoordinatesToRender();
+
     const characters = [];
 
-    Object.values(this.tiles).forEach((tile) => {
-      tile.terrain.update(this);
-      tile.terrain.render(this);
+    coordinatesToRender.forEach((coordinate) => {
+      this.tiles[coordinate].terrain.update(this);
+      this.tiles[coordinate].terrain.render(this);
 
-      if (tile.character) {
-        characters.push(tile.character);
+      if (this.tiles[coordinate].character) {
+        characters.push(this.tiles[coordinate].character);
       }
     });
 
