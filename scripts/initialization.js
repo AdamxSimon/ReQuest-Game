@@ -1,8 +1,6 @@
-let world;
+const gameWindow = document.getElementById("game-window");
 
-function initialize(height, width) {
-  world = new World(height, width);
-  world.initialize();
-}
+const worldConfig = { height: 999, width: 999, gameWindow };
 
-initialize(15, 15);
+world = new World(worldConfig);
+world.initialize();

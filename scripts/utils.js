@@ -1,3 +1,8 @@
+function getAverage(numbers) {
+  const sum = numbers.reduce((total, current) => total + current, 0);
+  return Math.floor(sum / numbers.length);
+}
+
 function withTileSize(value) {
   return value * tileSize;
 }

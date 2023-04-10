@@ -1,21 +1,29 @@
 class World {
-  constructor(height, width) {
-    this.height = height;
-    this.width = width;
+  constructor(config) {
+    this.height = config.height;
+    this.width = config.width;
 
     this.edgeCoordinates = [
       Math.floor(this.width / 2),
       Math.floor(this.height / 2),
     ];
 
+    this.gameWindow = config.gameWindow;
+    this.debugMenu = new DebugMenu({ world: this, container: this.gameWindow });
+
     this.canvas = document.createElement("canvas");
     this.context = this.canvas.getContext("2d");
+
+    this.isLoading = true;
 
     this.tiles = {};
 
     this.camera = new Camera();
 
-    this.renderDistance = 4;
+    this.renderDistance = 20;
+
+    this.lastThirtyFrames = [];
+    this.frameRateCounter = 0;
   }
 
   initializeTiles() {
@@ -64,15 +72,22 @@ class World {
   }
 
   initializeCanvas() {
-    const canvasContainer = document.getElementById("canvas-container");
+    this.canvas.height = this.gameWindow.clientHeight;
+    this.canvas.width = this.gameWindow.clientWidth;
 
-    this.canvas.height = canvasContainer.clientHeight;
-    this.canvas.width = canvasContainer.clientWidth;
+    window.addEventListener("resize", () => {
+      this.canvas.height = this.gameWindow.clientHeight;
+      this.canvas.width = this.gameWindow.clientWidth;
+    });
 
-    canvasContainer.appendChild(this.canvas);
+    this.gameWindow.innerText = "";
+
+    this.gameWindow.appendChild(this.canvas);
   }
 
   async initialize() {
+    this.gameWindow.textContent = "Loading...";
+
     await loadSprites(terrainSprites);
     await loadSprites(characterSprites);
 
@@ -80,6 +95,8 @@ class World {
     this.initializeTerrain();
     this.initializeCharacters();
     this.initializeCanvas();
+
+    this.debugMenu.render();
 
     this.play();
   }
@@ -116,6 +133,22 @@ class World {
   }
 
   play() {
+    const frameDifferenceInMS = this.lastFrame
+      ? performance.now() - this.lastFrame
+      : 0;
+
+    this.lastFrame = performance.now();
+
+    const fps = Math.floor(1000 / frameDifferenceInMS);
+
+    if (this.frameRateCounter !== 30) {
+      this.lastThirtyFrames[this.frameRateCounter] = fps;
+      this.frameRateCounter += 1;
+    } else {
+      this.debugMenu.update({ fps: getAverage(this.lastThirtyFrames) });
+      this.frameRateCounter = 0;
+    }
+
     this.context.clearRect(
       Math.floor(this.canvas.width / 2) -
         withTileSize(this.renderDistance + 1) -

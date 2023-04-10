@@ -14,9 +14,10 @@ body {
   margin: 0;
 }
 
-#canvas-container {
+#game-window {
   height: 100%;
   background-color: white;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,4 +27,12 @@ body {
 canvas {
   background-color: lightblue;
   image-rendering: pixelated;
+}
+
+#debug-menu {
+  height: 48px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 1;
 }
