@@ -9,6 +9,9 @@ class World {
     ];
 
     this.gameWindow = config.gameWindow;
+
+    this.loadingScreen = new LoadingScreen({ container: this.gameWindow });
+
     this.debugMenu = new DebugMenu({ world: this, container: this.gameWindow });
 
     this.canvas = document.createElement("canvas");
@@ -20,85 +23,105 @@ class World {
 
     this.camera = new Camera();
 
-    this.renderDistance = 20;
+    this.renderDistance = 50;
 
     this.lastThirtyFrames = [];
     this.frameRateCounter = 0;
   }
 
-  initializeTiles() {
-    for (let y = -this.edgeCoordinates[1]; y <= this.edgeCoordinates[1]; y++) {
+  async initializeTiles() {
+    await new Promise((resolve) => {
       for (
-        let x = -this.edgeCoordinates[0];
-        x <= this.edgeCoordinates[0];
-        x++
+        let y = -this.edgeCoordinates[1];
+        y <= this.edgeCoordinates[1];
+        y++
       ) {
-        this.tiles[getCoordinatesAsIndex([x, y])] = new Tile();
+        for (
+          let x = -this.edgeCoordinates[0];
+          x <= this.edgeCoordinates[0];
+          x++
+        ) {
+          this.tiles[getCoordinatesAsIndex([x, y])] = new Tile();
+        }
       }
-    }
+      resolve();
+    });
   }
 
-  initializeTerrain() {
-    for (let y = -this.edgeCoordinates[1]; y <= this.edgeCoordinates[1]; y++) {
+  async initializeTerrain() {
+    await new Promise((resolve) => {
       for (
-        let x = -this.edgeCoordinates[0];
-        x <= this.edgeCoordinates[0];
-        x++
+        let y = -this.edgeCoordinates[1];
+        y <= this.edgeCoordinates[1];
+        y++
       ) {
-        this.tiles[getCoordinatesAsIndex([x, y])].terrain = new Terrain({
-          position: [x, y],
-          imageIndex: "grass",
-        });
+        for (
+          let x = -this.edgeCoordinates[0];
+          x <= this.edgeCoordinates[0];
+          x++
+        ) {
+          this.tiles[getCoordinatesAsIndex([x, y])].terrain = new Terrain({
+            position: [x, y],
+            imageIndex: "grass",
+          });
+        }
       }
-    }
+      resolve();
+    });
   }
 
-  initializeCharacters() {
-    const initialPlayer = new Character({
-      position: [0, 0],
-      speed: 2,
-      isControlled: true,
-      imageIndex: "player",
-    });
-    const testCharacter = new Character({
-      position: [1, 0],
-      imageIndex: "character",
-    });
+  async initializeCharacters() {
+    await new Promise((resolve) => {
+      const initialPlayer = new Character({
+        position: [0, 0],
+        speed: 2,
+        isControlled: true,
+        imageIndex: "player",
+      });
+      const testCharacter = new Character({
+        position: [1, 0],
+        imageIndex: "character",
+      });
 
-    this.tiles[getCoordinatesAsIndex([0, 0])].character = initialPlayer;
-    this.tiles[getCoordinatesAsIndex([1, 0])].character = testCharacter;
+      this.tiles[getCoordinatesAsIndex([0, 0])].character = initialPlayer;
+      this.tiles[getCoordinatesAsIndex([1, 0])].character = testCharacter;
 
-    this.camera.updateFocus(initialPlayer);
+      this.camera.updateFocus(initialPlayer);
+      resolve();
+    });
   }
 
-  initializeCanvas() {
-    this.canvas.height = this.gameWindow.clientHeight;
-    this.canvas.width = this.gameWindow.clientWidth;
-
-    window.addEventListener("resize", () => {
+  async initializeCanvas() {
+    await new Promise((resolve) => {
       this.canvas.height = this.gameWindow.clientHeight;
       this.canvas.width = this.gameWindow.clientWidth;
+
+      window.addEventListener("resize", () => {
+        this.canvas.height = this.gameWindow.clientHeight;
+        this.canvas.width = this.gameWindow.clientWidth;
+      });
+
+      this.gameWindow.append(this.canvas);
+      resolve();
     });
-
-    this.gameWindow.innerText = "";
-
-    this.gameWindow.appendChild(this.canvas);
   }
 
   async initialize() {
-    this.gameWindow.textContent = "Loading...";
+    this.loadingScreen.initialize("Loading...");
 
     await loadSprites(terrainSprites);
     await loadSprites(characterSprites);
 
-    this.initializeTiles();
-    this.initializeTerrain();
-    this.initializeCharacters();
-    this.initializeCanvas();
+    await this.initializeTiles();
+    await this.initializeTerrain();
+    await this.initializeCharacters();
+    await this.initializeCanvas();
 
     this.debugMenu.render();
 
     this.play();
+
+    this.loadingScreen.unmount();
   }
 
   getGameWindowOffset() {

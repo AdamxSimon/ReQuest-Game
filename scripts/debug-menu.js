@@ -10,14 +10,18 @@ class DebugMenu {
 
     this.fps = document.createElement("div");
 
-    window.addEventListener("keydown", (event) => {
-      const key = event.key.toUpperCase();
+    window.addEventListener("keydown", (event) =>
+      this.#toggleVisibility(event)
+    );
+  }
 
-      if (key === "/") {
-        this.wrapper.style.visibility = this.isHidden ? "visible" : "hidden";
-        this.isHidden = !this.isHidden;
-      }
-    });
+  #toggleVisibility(event) {
+    const key = event.key.toUpperCase();
+
+    if (key === "/") {
+      this.wrapper.style.visibility = this.isHidden ? "visible" : "hidden";
+      this.isHidden = !this.isHidden;
+    }
   }
 
   update(data) {
@@ -25,8 +29,8 @@ class DebugMenu {
   }
 
   render() {
-    this.container.appendChild(this.wrapper);
-    this.wrapper.appendChild(this.fps);
+    this.container.append(this.wrapper);
+    this.wrapper.append(this.fps);
     this.wrapper.style.visibility = this.isHidden ? "hidden" : "visible";
   }
 }
