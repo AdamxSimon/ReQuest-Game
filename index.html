@@ -8,21 +8,35 @@
     <title>ReQuest</title>
   </head>
   <body>
-    <div id="game-window"></div>
+    <!-- Global -->
 
-    <!-- Scripts -->
+    <script src="scripts/global/utils.js"></script>
 
-    <script src="scripts/utils.js"></script>
-    <script src="scripts/controls.js"></script>
-    <script src="scripts/sprite.js"></script>
-    <script src="scripts/game-object.js"></script>
-    <script src="scripts/terrain.js"></script>
-    <script src="scripts/character.js"></script>
-    <script src="scripts/tile.js"></script>
-    <script src="scripts/camera.js"></script>
-    <script src="scripts/loading-screen.js"></script>
-    <script src="scripts/debug-menu.js"></script>
-    <script src="scripts/world.js"></script>
-    <script src="scripts/initialization.js"></script>
+    <!-- User Interface -->
+
+    <script src="scripts/user-interface/game-window.js"></script>
+    <script src="scripts/user-interface/loading-screen.js"></script>
+    <script src="scripts/user-interface/debug-menu.js"></script>
+
+    <!-- Engine -->
+
+    <script src="scripts/engine/controls.js"></script>
+    <script src="scripts/engine/camera.js"></script>
+    <script src="scripts/engine/sprite.js"></script>
+    <script src="scripts/engine/game-object.js"></script>
+    <script src="scripts/engine/terrain.js"></script>
+    <script src="scripts/engine/character.js"></script>
+    <script src="scripts/engine/tile.js"></script>
+    <script src="scripts/engine/world.js"></script>
+
+    <script>
+      const gameWindow = new GameWindow(document.body);
+
+      const worldConfig = { height: 999, width: 999 };
+
+      window.onload = () => {
+        gameWindow.loadWorld(worldConfig);
+      };
+    </script>
   </body>
 </html>

@@ -64,7 +64,9 @@ class Sprite {
         yObjectMovementOffset -
         this.world.withTileSize(yCamera) -
         yCameraMovementOffset +
-        yGameWindowOffset
+        yGameWindowOffset,
+      this.world.tileSize,
+      this.world.tileSize
     );
 
     if (this.animationFramesLeft === 0) {

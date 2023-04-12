@@ -26,7 +26,7 @@ class DebugMenu {
     this.fps.textContent = `FPS: ${data.fps}`;
   }
 
-  render() {
+  mount() {
     this.container.append(this.wrapper);
     this.wrapper.append(this.fps);
     this.wrapper.style.visibility = this.isHidden ? "hidden" : "visible";

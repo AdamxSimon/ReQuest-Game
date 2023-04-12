@@ -12,14 +12,8 @@ class World {
 
     this.gameWindow = config.gameWindow;
 
-    this.loadingScreen = new LoadingScreen({ container: this.gameWindow });
-
-    this.debugMenu = new DebugMenu({ world: this, container: this.gameWindow });
-
     this.canvas = document.createElement("canvas");
     this.context = this.canvas.getContext("2d");
-
-    this.isLoading = true;
 
     this.tiles = {};
 
@@ -98,21 +92,21 @@ class World {
 
   async #initializeCanvas() {
     await new Promise((resolve) => {
-      this.canvas.height = this.gameWindow.clientHeight;
-      this.canvas.width = this.gameWindow.clientWidth;
+      this.canvas.height = this.gameWindow.wrapper.clientHeight;
+      this.canvas.width = this.gameWindow.wrapper.clientWidth;
 
       window.addEventListener("resize", () => {
-        this.canvas.height = this.gameWindow.clientHeight;
-        this.canvas.width = this.gameWindow.clientWidth;
+        this.canvas.height = this.gameWindow.wrapper.clientHeight;
+        this.canvas.width = this.gameWindow.wrapper.clientWidth;
       });
 
-      this.gameWindow.append(this.canvas);
+      this.gameWindow.wrapper.append(this.canvas);
       resolve();
     });
   }
 
   async initialize() {
-    this.loadingScreen.initialize("Loading...");
+    this.gameWindow.loadingScreen.mount("Loading...");
 
     await loadSprites(terrainSprites);
     await loadSprites(characterSprites);
@@ -122,11 +116,11 @@ class World {
     await this.#initializeCharacters();
     await this.#initializeCanvas();
 
-    this.debugMenu.render();
+    this.gameWindow.debugMenu.mount();
 
     this.play();
 
-    this.loadingScreen.unmount();
+    this.gameWindow.loadingScreen.unmount();
   }
 
   withTileSize(number) {
@@ -177,7 +171,9 @@ class World {
       this.lastThirtyFrames[this.frameRateCounter] = fps;
       this.frameRateCounter += 1;
     } else {
-      this.debugMenu.update({ fps: getAverage(this.lastThirtyFrames) });
+      this.gameWindow.debugMenu.update({
+        fps: getAverage(this.lastThirtyFrames),
+      });
       this.frameRateCounter = 0;
     }
 
