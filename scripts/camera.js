@@ -12,22 +12,16 @@ class Camera {
       return [0, 0];
     }
 
-    const {
-      isMoving,
-      direction,
-      sprite: { animationFramesLeft },
-    } = this.focus;
-
-    if (isMoving) {
-      switch (direction) {
+    if (this.focus.isMoving) {
+      switch (this.focus.direction) {
         case "LEFT":
-          return [animationFramesLeft, 0];
+          return [this.focus.sprite.animationFramesLeft, 0];
         case "UP":
-          return [0, animationFramesLeft];
+          return [0, this.focus.sprite.animationFramesLeft];
         case "RIGHT":
-          return [-animationFramesLeft, 0];
+          return [-this.focus.sprite.animationFramesLeft, 0];
         case "DOWN":
-          return [0, -animationFramesLeft];
+          return [0, -this.focus.sprite.animationFramesLeft];
       }
     }
 

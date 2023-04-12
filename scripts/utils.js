@@ -3,11 +3,7 @@ function getAverage(numbers) {
   return Math.floor(sum / numbers.length);
 }
 
-function withTileSize(value) {
-  return value * tileSize;
-}
-
-function getCoordinatesAsIndex(coordinates) {
+function getCoordinatesAsString(coordinates) {
   const [x, y] = coordinates;
   return `[${x}, ${y}]`;
 }

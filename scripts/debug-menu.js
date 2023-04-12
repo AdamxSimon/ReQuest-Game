@@ -16,16 +16,14 @@ class DebugMenu {
   }
 
   #toggleVisibility(event) {
-    const key = event.key.toUpperCase();
-
-    if (key === "/") {
+    if (event.key === "/") {
       this.wrapper.style.visibility = this.isHidden ? "visible" : "hidden";
       this.isHidden = !this.isHidden;
     }
   }
 
   update(data) {
-    this.fps.innerHTML = `FPS: ${data.fps}`;
+    this.fps.textContent = `FPS: ${data.fps}`;
   }
 
   render() {

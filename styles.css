@@ -10,7 +10,6 @@ html {
 
 body {
   height: 100%;
-  background-color: black;
   margin: 0;
 }
 
@@ -25,7 +24,6 @@ body {
 }
 
 canvas {
-  background-color: lightblue;
   image-rendering: pixelated;
 }
 
@@ -40,13 +38,10 @@ canvas {
   justify-content: center;
   align-items: center;
   color: white;
-  z-index: 1;
 }
 
 #debug-menu {
-  height: 48px;
-  width: 100%;
+  height: fit-content;
   position: absolute;
   top: 0;
-  z-index: 1;
 }

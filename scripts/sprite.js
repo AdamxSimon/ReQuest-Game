@@ -1,15 +1,16 @@
 class Sprite {
   constructor(config) {
+    this.world = config.world;
     this.gameObject = config.gameObject;
 
-    this.animationFramesLeft = tileSize;
+    this.animationFramesLeft = this.world.tileSize;
 
     this.imageMap = config.imageMap;
     this.imageIndex = config.imageIndex;
     this.image = this.imageMap[this.imageIndex];
   }
 
-  getAnimationFrameOffset() {
+  #getAnimationFrameOffset() {
     if (this.gameObject.isMoving) {
       switch (this.gameObject.direction) {
         case "LEFT":
@@ -26,72 +27,49 @@ class Sprite {
     }
   }
 
-  getCameraMovementOffset(cameraFocus) {
-    const {
-      isMoving,
-      direction,
-      sprite: { animationFramesLeft },
-    } = cameraFocus;
-
-    if (isMoving) {
-      switch (direction) {
-        case "LEFT":
-          return [animationFramesLeft, 0];
-        case "UP":
-          return [0, animationFramesLeft];
-        case "RIGHT":
-          return [-animationFramesLeft, 0];
-        case "DOWN":
-          return [0, -animationFramesLeft];
-      }
-    } else {
-      return [0, 0];
-    }
-  }
-
-  #getDrawingCoordinates(coordinates, edgeCoordinates) {
+  #getDrawingCoordinates(coordinates) {
     return [
-      coordinates[0] + edgeCoordinates[0],
-      coordinates[1] + edgeCoordinates[1],
+      coordinates[0] + this.world.edgeCoordinates[0],
+      coordinates[1] + this.world.edgeCoordinates[1],
     ];
   }
 
-  draw(world) {
+  draw() {
     const [xObject, yObject] = this.#getDrawingCoordinates(
-      this.gameObject.position,
-      world.edgeCoordinates
+      this.gameObject.position
     );
 
-    const [xGameWindowOffset, yGameWindowOffset] = world.getGameWindowOffset();
+    const [xGameWindowOffset, yGameWindowOffset] =
+      this.world.getGameWindowOffset();
 
     if (this.gameObject.isMoving) {
       this.animationFramesLeft -= this.gameObject.speed;
     }
 
     const [xObjectMovementOffset, yObjectMovementOffset] =
-      this.getAnimationFrameOffset();
+      this.#getAnimationFrameOffset();
 
-    const [xCamera, yCamera] = world.camera.getPosition();
+    const [xCamera, yCamera] = this.world.camera.getPosition();
     const [xCameraMovementOffset, yCameraMovementOffset] =
-      world.camera.getCameraMovementOffset();
+      this.world.camera.getCameraMovementOffset();
 
-    world.context.drawImage(
+    this.world.context.drawImage(
       this.image,
-      withTileSize(xObject) +
+      this.world.withTileSize(xObject) +
         xObjectMovementOffset -
-        withTileSize(xCamera) -
+        this.world.withTileSize(xCamera) -
         xCameraMovementOffset +
         xGameWindowOffset,
-      withTileSize(yObject) +
+      this.world.withTileSize(yObject) +
         yObjectMovementOffset -
-        withTileSize(yCamera) -
+        this.world.withTileSize(yCamera) -
         yCameraMovementOffset +
         yGameWindowOffset
     );
 
     if (this.animationFramesLeft === 0) {
       this.gameObject.isMoving = false;
-      this.animationFramesLeft = tileSize;
+      this.animationFramesLeft = this.world.tileSize;
     }
   }
 }

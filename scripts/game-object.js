@@ -1,5 +1,7 @@
 class GameObject {
   constructor(config) {
+    this.world = config.world;
+
     this.position = config.position;
 
     this.isObstruction = config.isObstruction || false;
@@ -7,7 +9,7 @@ class GameObject {
     this.direction = "DOWN";
 
     this.isMoving = false;
-    this.speed = config.speed || defaultSpeed;
+    this.speed = config.speed || 1;
 
     this.sprite = new Sprite({ ...config, gameObject: this });
   }
@@ -17,26 +19,26 @@ class GameObject {
     this.position = destination;
   }
 
-  update(world) {
-    const heldDirection = this.controls?.heldDirections[0];
-
-    if (heldDirection && !this.isMoving) {
-      this.direction = heldDirection;
+  update() {
+    if (this.controls?.heldDirections.length && !this.isMoving) {
+      this.direction = this.controls.heldDirections[0];
       const destinationCoordinates = getNextTile(this.position, this.direction);
       const destinationTile =
-        world.tiles[getCoordinatesAsIndex(destinationCoordinates)];
+        this.world.tiles[getCoordinatesAsString(destinationCoordinates)];
 
       if (destinationTile && !destinationTile?.character?.isObstruction) {
         const previousPosition = this.position;
         this.move(destinationCoordinates);
-        world.tiles[getCoordinatesAsIndex(previousPosition)].character = null;
-        world.tiles[getCoordinatesAsIndex(destinationCoordinates)].character =
-          this;
+        this.world.tiles[getCoordinatesAsString(previousPosition)].character =
+          null;
+        this.world.tiles[
+          getCoordinatesAsString(destinationCoordinates)
+        ].character = this;
       }
     }
   }
 
-  render(world) {
-    this.sprite.draw(world);
+  render() {
+    this.sprite.draw();
   }
 }
